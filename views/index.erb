@@ -1,0 +1,12 @@
+<h2>All POSTS</h2>
+
+  <% @posts.each do |post|%>
+    <p>
+
+      <%= post['content'] %><br>
+      <br>
+      <b style="color: red; font-size: 75%;"><%= post['username'] %></b><br>
+      <span style="color: gray; font-size: 75%;">At <%= post['created_date'] %></span>
+      <hr>
+    </p>
+  <% end %>

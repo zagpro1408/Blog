@@ -25,11 +25,11 @@
 			      <span class="icon-bar"></span>
 			      <span class="icon-bar"></span>
 			    </button>
-			    <a class="navbar-brand" href="/">Sinatra + Twitter Bootstrap</a>
+			    <a class="navbar-brand" href="/">POSTS</a>
 			  </div>
 			  <div class="navbar-collapse collapse">
 			    <ul class="nav navbar-nav">
-			      <li><a href="/secure/place">Secret</a></li>
+			      <li><a href="/new">New Post</a></li>
 			    </ul>
 			    <ul class="nav navbar-nav navbar-right">
 			        <li class="dropdown">
@@ -47,7 +47,7 @@
 
 			<div>
 			      <%if @error then %>
-			          <div class="alert alert-error"><%=@error%></div>
+			          <div class="alert alert-danger"><%=@error%></div>
 			      <% end %>
 			      <%= yield %>
 			</div>

@@ -1,43 +1,64 @@
 require 'rubygems'
 require 'sinatra'
+require 'sqlite3'
 
-configure do
-  enable :sessions
+def init_db
+  @db = SQLite3::Database.new 'blog.db'
+  @db.results_as_hash = true
 end
 
+before do
+  init_db
+end
+
+configure do
+  init_db
+  @db.execute 'CREATE TABLE IF NOT EXISTS Posts
+    (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      created_date DATE,
+      username TEXT,
+      content TEXT
+    )'
+end
+
+get '/' do
+  @posts = @db.execute 'SELECT * FROM Posts order by id desc'
+  erb :index
+end
+
+get '/new' do
+  erb :new
+end
+
+post '/new' do
+  username = params[:username]
+  content = params[:content]
+
+  @db.execute 'INSERT INTO Posts
+  (created_date, username, content) values (datetime(), ?, ?)', [username, content]
+
+  # проверка на пустные поля
+  if username.strip.empty?
+    @error = "Please type your NAME"
+    return erb :new
+  end
+  if content.strip.empty?
+    @error = "Please type your TEXT"
+    return erb :new
+  end
+
+
+  redirect to '/'
+end
+
+
+
+
+
+########
 helpers do
   def username
     session[:identity] ? session[:identity] : 'Hello stranger'
   end
-end
-
-before '/secure/*' do
-  unless session[:identity]
-    session[:previous_url] = request.path
-    @error = 'Sorry, you need to be logged in to visit ' + request.path
-    halt erb(:login_form)
-  end
-end
-
-get '/' do
-  erb 'Can you handle a <a href="/secure/place">secret</a>?'
-end
-
-get '/login/form' do
-  erb :login_form
-end
-
-post '/login/attempt' do
-  session[:identity] = params['username']
-  where_user_came_from = session[:previous_url] || '/'
-  redirect to where_user_came_from
-end
-
-get '/logout' do
-  session.delete(:identity)
-  erb "<div class='alert alert-message'>Logged out</div>"
-end
-
-get '/secure/place' do
-  erb 'This is a secret place that only <%=session[:identity]%> has access to!'
 end
